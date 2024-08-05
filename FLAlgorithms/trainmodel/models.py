@@ -1,8 +1,20 @@
+# 这段代码定义了多个神经网络模型，
+# 包括不同的卷积神经网络（CNN）和全连接神经网络（DNN），主要用于图像分类任务。以下是逐行详细解释：
+
 import torch
+# torch 是 PyTorch 的核心库
 import torch.nn as nn
+# torch.nn 包含了神经网络的常用模块
 import torch.nn.functional as F
+# torch.nn.functional 提供了常用的神经网络函数
+
 
 class Net(nn.Module):
+    # 这是一个简单的卷积神经网络，包含两个卷积层、两个池化层和两个全连接层。
+    # conv1 和 conv2 是卷积层。
+    # dropout1 和 dropout2 是 dropout 层，用于防止过拟合。
+    # fc1 和 fc2 是全连接层。
+    # forward 方法定义了前向传播过程。
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 16, 2, 1)
@@ -28,7 +40,11 @@ class Net(nn.Module):
         output = F.log_softmax(x, dim=1)
         return output
 
+
 class Mclr_Logistic(nn.Module):
+    # 这是一个简单的多类逻辑回归模型，包含一个全连接层。
+    # fc1 是全连接层。
+    # forward 方法定义了前向传播过程。
     def __init__(self, input_dim = 784, output_dim = 10):
         super(Mclr_Logistic, self).__init__()
         self.fc1 = nn.Linear(input_dim, output_dim)
@@ -39,7 +55,11 @@ class Mclr_Logistic(nn.Module):
         output = F.log_softmax(x, dim=1)
         return output
 
+
 class Mclr_CrossEntropy(nn.Module):
+    # 这是一个使用交叉熵损失的多类逻辑回归模型。
+    # linear 是全连接层。
+    # forward 方法定义了前向传播过程。
     def __init__(self, input_dim = 784, output_dim = 10):
         super(Mclr_CrossEntropy, self).__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim)
@@ -49,7 +69,11 @@ class Mclr_CrossEntropy(nn.Module):
         outputs = self.linear(x)
         return outputs
 
+
 class DNN(nn.Module):
+    # 这是一个简单的全连接神经网络，包含两个全连接层。
+    # fc1 和 fc2 是全连接层。
+    # forward 方法定义了前向传播过程。
     def __init__(self, input_dim = 784, mid_dim = 100, output_dim = 10):
         super(DNN, self).__init__()
         # define network layers
@@ -64,7 +88,11 @@ class DNN(nn.Module):
         x = F.log_softmax(x, dim=1)
         return x
 
+
 class CifarNet(nn.Module):
+    # 这是一个用于 CIFAR-10 数据集的卷积神经网络。
+    # 包含两个卷积层、两个池化层和三个全连接层。
+    # forward 方法定义了前向传播过程。
     def __init__(self):
         super(CifarNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
@@ -93,8 +121,13 @@ cfg = {
     'VGG16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
     'VGG19': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
 }
+# VGG 模型的配置字典，不同的键对应不同版本的 VGG 网络架构。
+
 
 class VGG(nn.Module):
+    # 这是一个 VGG 网络模型，可以通过配置字典生成不同的 VGG 版本。
+    # _make_layers 方法根据配置字典生成卷积层和池化层的组合。
+    # forward 方法定义了前向传播过程。
     def __init__(self, vgg_name):
         super(VGG, self).__init__()
         self.features = self._make_layers(cfg[vgg_name])
@@ -129,6 +162,10 @@ class VGG(nn.Module):
 
 
 class CNNCifar(nn.Module):
+    # 这是另一个用于 CIFAR 数据集的卷积神经网络。
+    # 包含两个卷积层、两个池化层和三个全连接层。
+    # weight_keys 列表包含所有层的权重和偏置，用于在联邦学习中可能的模型权重更新。
+    # forward 方法定义了前向传播过程。
     def __init__(self, num_classes):
         super(CNNCifar, self).__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
