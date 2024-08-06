@@ -1,12 +1,17 @@
 from torch.optim import Optimizer
+# 这段代码定义了四个自定义的优化器，分别为 MySGD、FEDLOptimizer、pFedMeOptimizer 和 APFLOptimizer。
+# 这些优化器类继承了 torch.optim.Optimizer 并实现了 step 方法，用于更新模型参数。下面是每个类的详细解释：
 
 
 class MySGD(Optimizer):
     def __init__(self, params, lr):
         defaults = dict(lr=lr)
+        # __init__ 方法：初始化优化器，设置学习率 lr。
         super(MySGD, self).__init__(params, defaults)
 
     def step(self, closure=None, beta = 0):
+        # step 方法：执行参数更新。根据是否设置了 beta 值，使用 beta 或学习率 lr 更新参数。
+        # 如果 beta 不为 0，使用 beta 乘以梯度来更新参数；否则，使用学习率 lr 进行更新。
         loss = None
         if closure is not None:
             loss = closure
@@ -26,6 +31,7 @@ class MySGD(Optimizer):
 
 class FEDLOptimizer(Optimizer):
     def __init__(self, params, lr=0.01, server_grads=None, pre_grads=None, eta=0.1):
+        # __init__ 方法：初始化优化器，设置学习率 lr、服务器梯度 server_grads、之前的梯度 pre_grads 和参数 eta。
         self.server_grads = server_grads
         self.pre_grads = pre_grads
         if lr < 0.0:
@@ -34,6 +40,9 @@ class FEDLOptimizer(Optimizer):
         super(FEDLOptimizer, self).__init__(params, defaults)
 
     def step(self, closure=None):
+        # step 方法：执行参数更新，使用当前梯度、服务器梯度、之前的梯度和学习率 lr。参数更新公式为：
+        # p.data = p.data - \text{lr} \times (p.grad.data + \eta \times \text{server_grads}[i] - \text{pre_grads}[i])
+        # 其中，i 用于索引不同的参数。
         loss = None
         if closure is not None:
             loss = closure
@@ -46,8 +55,10 @@ class FEDLOptimizer(Optimizer):
                 i += 1
         return loss
 
+
 class pFedMeOptimizer(Optimizer):
     def __init__(self, params, lr=0.01, lamda=0.1 , mu = 0.001):
+        # __init__ 方法：初始化优化器，设置学习率 lr、lambda 和 mu。
         #self.local_weight_updated = local_weight # w_i,K
         if lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
@@ -55,6 +66,9 @@ class pFedMeOptimizer(Optimizer):
         super(pFedMeOptimizer, self).__init__(params, defaults)
     
     def step(self, local_weight_updated, closure=None):
+        # step 方法：执行参数更新，使用当前梯度、lambda 和 mu。参数更新公式为：
+        # p.data=p.data−lr×(p.grad.data+λ×(p.data−localweight.data)+μ×p.da
+        # 其中，local_weight_updated 是本地更新的权重。
         loss = None
         if closure is not None:
             loss = closure
@@ -65,6 +79,7 @@ class pFedMeOptimizer(Optimizer):
         return  group['params'], loss
     
     def update_param(self, local_weight_updated, closure=None):
+        # update_param 方法：将模型参数更新为本地权重 local_weight_updated。
         loss = None
         if closure is not None:
             loss = closure
@@ -78,10 +93,12 @@ class pFedMeOptimizer(Optimizer):
 
 class APFLOptimizer(Optimizer):
     def __init__(self, params, lr):
+        # __init__ 方法：初始化优化器，设置学习率 lr。
         defaults = dict(lr=lr)
         super(APFLOptimizer, self).__init__(params, defaults)
 
     def step(self, closure=None, beta = 1, n_k = 1):
+        # step 方法：执行参数更新。使用 beta 和 n_k 计算更新量
         loss = None
         if closure is not None:
             loss = closure

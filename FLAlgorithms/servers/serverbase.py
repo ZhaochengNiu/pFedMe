@@ -31,8 +31,10 @@ class Server:
         #    param.data = torch.zeros_like(param.data)
         #    param.grad = torch.zeros_like(param.data)
         #self.send_parameters()
+        # 该方法初始化了服务器的一些属性，包括设备、数据集、算法、模型、批量大小、学习率、全局迭代次数、本地训练轮数、优化器、用户数和时间等。
         
     def aggregate_grads(self):
+        # aggregate_grads 方法用于聚合所有用户的梯度，并更新服务器模型的梯度。
         assert (self.users is not None and len(self.users) > 0)
         for param in self.model.parameters():
             param.grad = torch.zeros_like(param.data)
@@ -40,21 +42,25 @@ class Server:
             self.add_grad(user, user.train_samples / self.total_train_samples)
 
     def add_grad(self, user, ratio):
+        # add_grad 方法用于将单个用户的梯度按比例添加到服务器的梯度中。
         user_grad = user.get_grads()
         for idx, param in enumerate(self.model.parameters()):
             param.grad = param.grad + user_grad[idx].clone() * ratio
 
     def send_parameters(self):
+        # 该方法将服务器模型的参数发送给所有用户。
         assert (self.users is not None and len(self.users) > 0)
         for user in self.users:
             user.set_parameters(self.model)
 
     def add_parameters(self, user, ratio):
+        # add_parameters 方法用于将单个用户的参数按比例添加到服务器的参数中。
         model = self.model.parameters()
         for server_param, user_param in zip(self.model.parameters(), user.get_parameters()):
             server_param.data = server_param.data + user_param.data.clone() * ratio
 
     def aggregate_parameters(self):
+        # aggregate_parameters 方法用于聚合选定用户的参数，并更新服务器模型的参数。
         assert (self.users is not None and len(self.users) > 0)
         for param in self.model.parameters():
             param.data = torch.zeros_like(param.data)
@@ -64,6 +70,8 @@ class Server:
             total_train += user.train_samples
         for user in self.selected_users:
             self.add_parameters(user, user.train_samples / total_train)
+
+    # 这些方法用于保存和加载服务器模型。
 
     def save_model(self):
         model_path = os.path.join("models", self.dataset)
@@ -89,6 +97,7 @@ class Server:
         Return:
             list of selected clients objects
         '''
+        # 该方法用于在每一轮中选择指定数量的用户进行训练。
         if(num_users == len(self.users)):
             print("All users are selected")
             return self.users
@@ -97,12 +106,13 @@ class Server:
         #np.random.seed(round)
         return np.random.choice(self.users, num_users, replace=False) #, p=pk)
 
+    # 这些方法用于个性化更新和聚合参数。
+
     # define function for persionalized agegatation.
     def persionalized_update_parameters(self,user, ratio):
         # only argegate the local_weight_update
         for server_param, user_param in zip(self.model.parameters(), user.local_weight_updated):
             server_param.data = server_param.data + user_param.data.clone() * ratio
-
 
     def persionalized_aggregate_parameters(self):
         assert (self.users is not None and len(self.users) > 0)
@@ -126,6 +136,7 @@ class Server:
             
     # Save loss, accurancy to h5 fiel
     def save_results(self):
+        # 这些方法用于保存训练和评估结果。
         alg = self.dataset + "_" + self.algorithm
         alg = alg + "_" + str(self.learning_rate) + "_" + str(self.beta) + "_" + str(self.lamda) + "_" + str(self.num_users) + "u" + "_" + str(self.batch_size) + "b" + "_" + str(self.local_epochs)
         if(self.algorithm == "pFedMe" or self.algorithm == "pFedMe_p"):
@@ -150,6 +161,8 @@ class Server:
                 hf.create_dataset('rs_train_acc', data=self.rs_train_acc_per)
                 hf.create_dataset('rs_train_loss', data=self.rs_train_loss_per)
                 hf.close()
+
+    # 这些方法用于测试和计算训练误差。
 
     def test(self):
         '''tests self.latest_model on given clients

@@ -6,6 +6,7 @@ from matplotlib.ticker import StrMethodFormatter
 import os
 plt.rcParams.update({'font.size': 14})
 
+
 def simple_read_data(alg):
     print(alg)
     hf = h5py.File("./results/"+'{}.h5'.format(alg), 'r')
@@ -13,6 +14,7 @@ def simple_read_data(alg):
     rs_train_acc = np.array(hf.get('rs_train_acc')[:])
     rs_train_loss = np.array(hf.get('rs_train_loss')[:])
     return rs_train_acc, rs_train_loss, rs_glob_acc
+
 
 def get_training_data_value(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[], learning_rate=[],beta=[],algorithms_list=[], batch_size=[], dataset="", k= [] , personal_learning_rate = []):
     Numb_Algs = len(algorithms_list)
@@ -32,6 +34,7 @@ def get_training_data_value(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[
             simple_read_data(dataset +"_"+ algorithms_list[i] + "_avg"))[:, :Numb_Glob_Iters]
         algs_lbl[i] = algs_lbl[i]
     return glob_acc, train_acc, train_loss
+
 
 def get_all_training_data_value(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=0, learning_rate=0,beta=0,algorithms="", batch_size=0, dataset="", k= 0 , personal_learning_rate =0 ,times = 5):
     train_acc = np.zeros((times, Numb_Glob_Iters))
@@ -61,6 +64,7 @@ def get_data_label_style(input_data = [], linestyles= [], algs_lbl = [], lamb = 
 
     return data, lstyles, labels
 
+
 def average_data(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb="", learning_rate="", beta="", algorithms="", batch_size=0, dataset = "", k = "", personal_learning_rate = "", times = 5):
     if(algorithms == "PerAvg"):
         algorithms = "PerAvg_p"
@@ -87,6 +91,7 @@ def average_data(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb="", learning
             hf.create_dataset('rs_train_acc', data=train_acc_data)
             hf.create_dataset('rs_train_loss', data=train_loss_data)
             hf.close()
+
 
 def plot_summary_one_figure(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[], learning_rate=[], beta=[], algorithms_list=[], batch_size=0, dataset = "", k = [], personal_learning_rate = []):
     Numb_Algs = len(algorithms_list)
@@ -139,6 +144,7 @@ def plot_summary_one_figure(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[
     plt.savefig(dataset.upper() + str(loc_ep1[1]) + 'glob_acc.png', bbox_inches="tight")
     #plt.savefig(dataset + str(loc_ep1[1]) + 'glob_acc.pdf')
 
+
 def get_max_value_index(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[], learning_rate=[], algorithms_list=[], batch_size=0, dataset=""):
     Numb_Algs = len(algorithms_list)
     glob_acc, train_acc, train_loss = get_training_data_value(
@@ -146,6 +152,7 @@ def get_max_value_index(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[], l
     for i in range(Numb_Algs):
         print("Algorithm: ", algorithms_list[i], "Max testing Accurancy: ", glob_acc[i].max(
         ), "Index: ", np.argmax(glob_acc[i]), "local update:", loc_ep1[i])
+
 
 def get_label_name(name):
     if name.startswith("pFedMe"):
@@ -159,6 +166,7 @@ def get_label_name(name):
         return "FedAvg"
     if name.startswith("APFL"):
         return "APFL"
+
 
 def average_smooth(data, window_len=20, window='hanning'):
     results = []
@@ -176,6 +184,7 @@ def average_smooth(data, window_len=20, window='hanning'):
         y=np.convolve(w/w.sum(),s,mode='valid')
         results.append(y[window_len-1:])
     return np.array(results)
+
 
 def plot_summary_one_figure_synthetic_R(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
@@ -218,6 +227,7 @@ def plot_summary_one_figure_synthetic_R(num_users, loc_ep1, Numb_Glob_Iters, lam
     #plt.savefig(dataset.upper() + "Convex_Syn_fixR.pdf", bbox_inches="tight")
     plt.close()
 
+
 def plot_summary_one_figure_synthetic_K(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
     dataset = dataset
@@ -256,6 +266,7 @@ def plot_summary_one_figure_synthetic_K(num_users, loc_ep1, Numb_Glob_Iters, lam
     plt.ylim([0.6,  0.86])
     plt.savefig(dataset.upper() + "Convex_Syn_fixK_test.pdf", bbox_inches="tight")
     plt.close()
+
 
 def plot_summary_one_figure_synthetic_L(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
@@ -296,6 +307,7 @@ def plot_summary_one_figure_synthetic_L(num_users, loc_ep1, Numb_Glob_Iters, lam
     plt.savefig(dataset.upper() + "Convex_Syn_fixL_test.pdf", bbox_inches="tight")
     plt.close()
 
+
 def plot_summary_one_figure_synthetic_D(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
     dataset = dataset
@@ -334,6 +346,7 @@ def plot_summary_one_figure_synthetic_D(num_users, loc_ep1, Numb_Glob_Iters, lam
     plt.ylim([0.6,  0.86])
     plt.savefig(dataset.upper() + "Convex_Syn_fixL_test.pdf", bbox_inches="tight")
     plt.close()
+
 
 def plot_summary_one_figure_synthetic_Compare(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
@@ -433,6 +446,7 @@ def plot_summary_one_figure_mnist_Compare(num_users, loc_ep1, Numb_Glob_Iters, l
     #plt.savefig(dataset.upper() + "Non_Convex_Mnist_test_Com.pdf", bbox_inches="tight")
     plt.close()
 
+
 def plot_summary_one_figure_mnist_K(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
     dataset = dataset
@@ -481,6 +495,7 @@ def plot_summary_one_figure_mnist_K(num_users, loc_ep1, Numb_Glob_Iters, lamb, l
    #plt.savefig(dataset.upper() + "Non_Convex_Mnist_test_K.pdf", bbox_inches="tight")
     plt.close()
 
+
 def plot_summary_one_figure_mnist_R(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
     dataset = dataset
@@ -527,6 +542,7 @@ def plot_summary_one_figure_mnist_R(num_users, loc_ep1, Numb_Glob_Iters, lamb, l
     #plt.savefig(dataset.upper() + "Non_Convex_Mnist_test_R.pdf", bbox_inches="tight")
     plt.close()
 
+
 def plot_summary_one_figure_mnist_L(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
     dataset = dataset
@@ -572,6 +588,7 @@ def plot_summary_one_figure_mnist_L(num_users, loc_ep1, Numb_Glob_Iters, lamb, l
     plt.savefig(dataset.upper() + "Convex_Mnist_test_L.pdf", bbox_inches="tight")
     #plt.savefig(dataset.upper() + "Non_Convex_Mnist_test_L.pdf", bbox_inches="tight")
     plt.close()
+
 
 def plot_summary_one_figure_mnist_D(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, beta, algorithms_list, batch_size, dataset, k, personal_learning_rate):
     Numb_Algs = len(algorithms_list)   
